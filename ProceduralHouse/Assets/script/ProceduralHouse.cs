@@ -1,13 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
-// Classe pour stocker les connexions entre pièces
+// Classe de connexion entre piÃ¨ces
 public class RoomConnection
 {
-    public int room1Index; // Index première pièce
-    public int room2Index; // Index seconde pièce
-    public int direction; // Direction: 0=Nord, 1=Est, 2=Sud, 3=Ouest
+    public int room1Index;
+    public int room2Index;
+    public int direction;
 
     public RoomConnection(int r1, int r2, int dir)
     {
@@ -38,11 +37,8 @@ public class ProceduralHouse : MonoBehaviour
     public float playerHeight = 1.8f;
     private GameObject player;
 
-    // Listes pour stocker les pièces par étage
     private List<List<RectInt>> floorRooms = new List<List<RectInt>>();
-    // Position des escaliers
     private List<Vector3> stairPositions = new List<Vector3>();
-    // Structure pour stocker les connexions entre pièces (pour placer les portes)
     private Dictionary<int, List<RoomConnection>> floorConnections = new Dictionary<int, List<RoomConnection>>();
 
     void Start()
@@ -53,20 +49,20 @@ public class ProceduralHouse : MonoBehaviour
 
     void GenerateHouse()
     {
-        // Initialiser les listes pour chaque étage
+        // Initialiser les listes pour chaque Ã©tage
         for (int floor = 0; floor < numberOfFloors; floor++)
         {
             floorRooms.Add(new List<RectInt>());
             floorConnections[floor] = new List<RoomConnection>();
         }
 
-        // Générer les pièces pour chaque étage
+        // GÃ©nÃ©rer les piÃ¨ces pour chaque Ã©tage
         for (int floor = 0; floor < numberOfFloors; floor++)
         {
             GenerateFloor(floor);
         }
 
-        // Ajouter des escaliers entre les étages
+        // Ajouter des escaliers entre les Ã©tages
         ConnectFloors();
     }
 
@@ -75,22 +71,22 @@ public class ProceduralHouse : MonoBehaviour
         List<RectInt> currentFloorRooms = floorRooms[floorNumber];
         float floorY = floorNumber * floorHeight;
 
-        // Créer la première pièce (entrée ou pièce principale)
+        // CrÃ©er la premiÃ¨re piÃ¨ce (entrÃ©e ou piÃ¨ce principale)
         Vector2Int firstRoomSize = new Vector2Int(
             Random.Range(roomSizeMin.x, roomSizeMax.x + 1),
             Random.Range(roomSizeMin.y, roomSizeMax.y + 1)
         );
 
-        // Placement dépendant de l'étage
+        // Placement dÃ©pendant de l'Ã©tage
         Vector2Int firstRoomPos;
         if (floorNumber == 0)
         {
-            // Rez-de-chaussée: entrée centrée
+            // Rez-de-chaussÃ©e: entrÃ©e centrÃ©e
             firstRoomPos = new Vector2Int(0, 0);
         }
         else
         {
-            // Étages supérieurs: aligner avec l'escalier du dessous si possible
+            // Ã‰tages supÃ©rieurs: aligner avec l'escalier du dessous si possible
             if (stairPositions.Count > 0)
             {
                 Vector3 lastStair = stairPositions[stairPositions.Count - 1];
@@ -106,14 +102,14 @@ public class ProceduralHouse : MonoBehaviour
         currentFloorRooms.Add(firstRoom);
         CreateRoom(firstRoom, floorY);
 
-        // Générer les autres pièces
+        // GÃ©nÃ©rer les autres piÃ¨ces
         for (int i = 1; i < numberOfRoomsPerFloor; i++)
         {
-            // Choisir une pièce existante pour connecter
+            // Choisir une piÃ¨ce existante pour connecter
             int connectToIndex = Random.Range(0, currentFloorRooms.Count);
             RectInt connectedRoom = currentFloorRooms[connectToIndex];
 
-            // Déterminer une direction aléatoire (0 = nord, 1 = est, 2 = sud, 3 = ouest)
+            // DÃ©terminer une direction alÃ©atoire (0 = nord, 1 = est, 2 = sud, 3 = ouest)
             int direction = Random.Range(0, 4);
 
             Vector2Int size = new Vector2Int(
@@ -123,7 +119,7 @@ public class ProceduralHouse : MonoBehaviour
 
             Vector2Int position = Vector2Int.zero;
 
-            // Positionner la nouvelle pièce en fonction de la direction
+            // Positionner la nouvelle piÃ¨ce en fonction de la direction
             switch (direction)
             {
                 case 0: // Nord
@@ -154,11 +150,11 @@ public class ProceduralHouse : MonoBehaviour
 
             RectInt newRoom = new RectInt(position, size);
 
-            // Vérifier les chevauchements
+            // VÃ©rifier les chevauchements
             bool overlaps = false;
             foreach (var room in currentFloorRooms)
             {
-                // Agrandir légèrement la zone pour éviter des pièces trop proches
+                // Agrandir lÃ©gÃ¨rement la zone pour Ã©viter des piÃ¨ces trop proches
                 RectInt expandedRoom = new RectInt(
                     room.x - 1, room.y - 1,
                     room.width + 2, room.height + 2
@@ -177,7 +173,7 @@ public class ProceduralHouse : MonoBehaviour
                 currentFloorRooms.Add(newRoom);
                 CreateRoom(newRoom, floorY);
 
-                // Connecter la nouvelle pièce à la pièce existante
+                // Connecter la nouvelle piÃ¨ce Ã  la piÃ¨ce existante
                 Vector2Int from = Vector2Int.RoundToInt(connectedRoom.center);
                 Vector2Int to = Vector2Int.RoundToInt(newRoom.center);
 
@@ -189,30 +185,30 @@ public class ProceduralHouse : MonoBehaviour
             }
             else
             {
-                i--; // Réessayer
+                i--; // RÃ©essayer
             }
         }
 
-        // Maintenant que toutes les pièces sont créées, ajouter les portes
+        // Maintenant que toutes les piÃ¨ces sont crÃ©Ã©es, ajouter les portes
         CreateDoors(floorNumber);
     }
 
     void CreateRoom(RectInt room, float floorY)
     {
-        string floorName = floorY == 0 ? "RDC" : "Étage " + (Mathf.RoundToInt(floorY / floorHeight));
+        string floorName = floorY == 0 ? "RDC" : "Ã‰tage " + (Mathf.RoundToInt(floorY / floorHeight));
 
-        // Créer un conteneur pour la pièce
-        GameObject roomObj = new GameObject("Pièce " + floorName + " [" + room.x + "," + room.y + "]");
+        // CrÃ©er un conteneur pour la piÃ¨ce
+        GameObject roomObj = new GameObject("PiÃ¨ce " + floorName + " [" + room.x + "," + room.y + "]");
         roomObj.transform.parent = this.transform;
 
-        // Crée le sol
+        // CrÃ©e le sol
         GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
         floor.name = "Sol";
         floor.transform.position = new Vector3(room.x + room.width / 2f, floorY, room.y + room.height / 2f);
         floor.transform.localScale = new Vector3(room.width, 0.2f, room.height);
         floor.transform.parent = roomObj.transform;
 
-        // Matériau pour le sol (pour distinguer les pièces)
+        // MatÃ©riau pour le sol (pour distinguer les piÃ¨ces)
         Renderer floorRenderer = floor.GetComponent<Renderer>();
         floorRenderer.material.color = new Color(
             Random.Range(0.6f, 0.9f),
@@ -220,7 +216,7 @@ public class ProceduralHouse : MonoBehaviour
             Random.Range(0.6f, 0.9f)
         );
 
-        // Murs haut/bas - On ne crée pas les portes ici, elles seront ajoutées plus tard
+        // Murs haut/bas - On ne crÃ©e pas les portes ici, elles seront ajoutÃ©es plus tard
         CreateWall(room.x + room.width / 2f, floorY + wallHeight / 2f, room.y + room.height, room.width, wallHeight, wallThickness, roomObj.transform, "north"); // haut
         CreateWall(room.x + room.width / 2f, floorY + wallHeight / 2f, room.y, room.width, wallHeight, wallThickness, roomObj.transform, "south"); // bas
 
@@ -228,7 +224,7 @@ public class ProceduralHouse : MonoBehaviour
         CreateWall(room.x, floorY + wallHeight / 2f, room.y + room.height / 2f, wallThickness, wallHeight, room.height, roomObj.transform, "west"); // gauche
         CreateWall(room.x + room.width, floorY + wallHeight / 2f, room.y + room.height / 2f, wallThickness, wallHeight, room.height, roomObj.transform, "east"); // droite
 
-        // Plafond (sauf pour le dernier étage)
+        // Plafond (sauf pour le dernier Ã©tage)
         if (floorY / floorHeight < numberOfFloors - 1)
         {
             GameObject ceiling = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -292,11 +288,11 @@ public class ProceduralHouse : MonoBehaviour
             RectInt room1 = rooms[connection.room1Index];
             RectInt room2 = rooms[connection.room2Index];
 
-            // Déterminer la position de la porte en fonction de la direction
+            // DÃ©terminer la position de la porte en fonction de la direction
             Vector3 doorPosition = Vector3.zero;
             Vector3 doorScale = Vector3.zero;
 
-            // Identifier les murs à "couper"
+            // Identifier les murs Ã  "couper"
             GameObject wallToCut = null;
             Vector3 cutPosition = Vector3.zero;
             Vector3 cutSize = Vector3.zero;
@@ -304,7 +300,7 @@ public class ProceduralHouse : MonoBehaviour
             switch (connection.direction)
             {
                 case 0: // Nord (room1 est au sud de room2)
-                        // Trouver un point de passage viable entre les deux pièces
+                        // Trouver un point de passage viable entre les deux piÃ¨ces
                     int doorX = FindValidDoorPosition(room1.x, room1.x + room1.width, room2.x, room2.x + room2.width);
 
                     doorPosition = new Vector3(
@@ -314,12 +310,12 @@ public class ProceduralHouse : MonoBehaviour
                     );
                     doorScale = new Vector3(doorWidth, doorHeight, wallThickness);
 
-                    // Trouver le mur à couper
+                    // Trouver le mur Ã  couper
                     cutPosition = new Vector3(doorX, floorY + wallHeight / 2f, room2.y);
                     cutSize = new Vector3(doorWidth, doorHeight, wallThickness);
                     break;
 
-                case 1: // Est (room1 est à l'ouest de room2)
+                case 1: // Est (room1 est Ã  l'ouest de room2)
                     int doorZ = FindValidDoorPosition(room1.y, room1.y + room1.height, room2.y, room2.y + room2.height);
 
                     doorPosition = new Vector3(
@@ -347,7 +343,7 @@ public class ProceduralHouse : MonoBehaviour
                     cutSize = new Vector3(doorWidth, doorHeight, wallThickness);
                     break;
 
-                case 3: // Ouest (room1 est à l'est de room2)
+                case 3: // Ouest (room1 est Ã  l'est de room2)
                     int doorZ2 = FindValidDoorPosition(room1.y, room1.y + room1.height, room2.y, room2.y + room2.height);
 
                     doorPosition = new Vector3(
@@ -362,15 +358,15 @@ public class ProceduralHouse : MonoBehaviour
                     break;
             }
 
-            // Créer la porte et effectuer la coupe dans le mur
+            // CrÃ©er la porte et effectuer la coupe dans le mur
             GameObject door = new GameObject("Porte " + connection.room1Index + " -> " + connection.room2Index);
             door.transform.parent = this.transform;
             door.transform.position = doorPosition;
 
-            // Créer l'ouverture dans le mur
+            // CrÃ©er l'ouverture dans le mur
             CutWallForDoor(cutPosition, cutSize, floorY, connection.direction);
 
-            // Ajouter un BoxCollider pour créer un "trou" dans le mur
+            // Ajouter un BoxCollider pour crÃ©er un "trou" dans le mur
             BoxCollider doorCollider = door.AddComponent<BoxCollider>();
             doorCollider.size = doorScale;
             doorCollider.isTrigger = true; // Pour que le joueur puisse traverser
@@ -386,10 +382,10 @@ public class ProceduralHouse : MonoBehaviour
         int overlapMin = Mathf.Max(min1, min2);
         int overlapMax = Mathf.Min(max1, max2);
 
-        // Si pas de chevauchement, utiliser le point médian entre les deux pièces
+        // Si pas de chevauchement, utiliser le point mÃ©dian entre les deux piÃ¨ces
         if (overlapMax <= overlapMin)
         {
-            return (min1 + max1 + min2 + max2) / 4; // Point médian
+            return (min1 + max1 + min2 + max2) / 4; // Point mÃ©dian
         }
 
         // Trouver un point au milieu de la zone de chevauchement pour placer la porte
@@ -412,15 +408,15 @@ public class ProceduralHouse : MonoBehaviour
 
     void CutWallForDoor(Vector3 position, Vector3 size, float floorY, int direction)
     {
-        // Trouver tous les murs qui pourraient être affectés
+        // Trouver tous les murs qui pourraient Ãªtre affectÃ©s
         Collider[] colliders = Physics.OverlapBox(position, size / 2f);
 
         foreach (var collider in colliders)
         {
-            // Vérifier si c'est un mur
+            // VÃ©rifier si c'est un mur
             if (collider.gameObject.name.Contains("Mur"))
             {
-                // Différentes approches selon la direction de la porte
+                // DiffÃ©rentes approches selon la direction de la porte
                 if ((direction == 0 || direction == 2) && collider.gameObject.name.Contains("north") ||
                     collider.gameObject.name.Contains("south"))
                 {
@@ -445,7 +441,7 @@ public class ProceduralHouse : MonoBehaviour
 
         bool isHorizontal = wallScale.x > wallScale.z;
 
-        wall.SetActive(false); // On désactive le mur original
+        wall.SetActive(false); // On dÃ©sactive le mur original
 
         if (isHorizontal)
         {
@@ -470,11 +466,11 @@ public class ProceduralHouse : MonoBehaviour
                     wall.transform.parent, wall.name + "_Right");
             }
 
-            // La partie au-dessus de la porte est supprimée
+            // La partie au-dessus de la porte est supprimÃ©e
         }
         else
         {
-            // Même logique, mais pour les murs verticaux (axe Z)
+            // MÃªme logique, mais pour les murs verticaux (axe Z)
             float frontDepth = (doorPosition.z - doorSize.z / 2f) - (wallPos.z - wallScale.z / 2f);
             float backDepth = (wallPos.z + wallScale.z / 2f) - (doorPosition.z + doorSize.z / 2f);
 
@@ -494,12 +490,12 @@ public class ProceduralHouse : MonoBehaviour
                     wall.transform.parent, wall.name + "_Back");
             }
 
-            // La partie au-dessus de la porte est supprimée
+            // La partie au-dessus de la porte est supprimÃ©e
         }
     }
 
 
-    // Créer un segment de mur
+    // CrÃ©er un segment de mur
     void CreateWallSegment(Vector3 position, Vector3 scale, Transform parent, string name)
     {
         GameObject wallSegment = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -508,16 +504,16 @@ public class ProceduralHouse : MonoBehaviour
         wallSegment.transform.localScale = scale;
         wallSegment.transform.parent = parent;
 
-        // Appliquer le même matériau que les autres murs
+        // Appliquer le mÃªme matÃ©riau que les autres murs
         Renderer wallRenderer = wallSegment.GetComponent<Renderer>();
         wallRenderer.material.color = new Color(0.9f, 0.9f, 0.9f);
     }
 
     
-    // Méthode pour vérifier et créer une ouverture dans un mur sur le chemin d'un corridor
+    // MÃ©thode pour vÃ©rifier et crÃ©er une ouverture dans un mur sur le chemin d'un corridor
     void CheckAndCreateOpenings(Vector3 position, float floorY, int dirX, int dirY)
     {
-        // Déterminer la taille et la direction de l'ouverture
+        // DÃ©terminer la taille et la direction de l'ouverture
         Vector3 size;
         int direction;
 
@@ -532,14 +528,14 @@ public class ProceduralHouse : MonoBehaviour
             direction = dirY > 0 ? 0 : 2; // Nord ou Sud
         }
 
-        // Rechercher les murs à cette position
+        // Rechercher les murs Ã  cette position
         Collider[] colliders = Physics.OverlapBox(position, size / 2f);
 
         foreach (var collider in colliders)
         {
             if (collider.gameObject.name.Contains("Mur"))
             {
-                // Créer une ouverture dans ce mur
+                // CrÃ©er une ouverture dans ce mur
                 CutWallForDoor(position, size, floorY, direction);
                 break;
             }
@@ -551,11 +547,11 @@ public class ProceduralHouse : MonoBehaviour
         // Couleur du cadre de porte
         Color doorFrameColor = new Color(0.5f, 0.35f, 0.2f); // Marron pour simuler du bois
 
-        // Calculer l'épaisseur du cadre
+        // Calculer l'Ã©paisseur du cadre
         float frameThickness = 0.1f;
 
-        // Créer les montants verticaux du cadre
-        if (scale.x > scale.z) // Porte orientée le long de l'axe X
+        // CrÃ©er les montants verticaux du cadre
+        if (scale.x > scale.z) // Porte orientÃ©e le long de l'axe X
         {
             // Montant gauche
             GameObject leftPost = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -573,7 +569,7 @@ public class ProceduralHouse : MonoBehaviour
             rightPost.transform.parent = parent;
             rightPost.GetComponent<Renderer>().material.color = doorFrameColor;
 
-            // Traverse supérieure
+            // Traverse supÃ©rieure
             GameObject topBeam = GameObject.CreatePrimitive(PrimitiveType.Cube);
             topBeam.name = "TraverseHaute";
             topBeam.transform.position = new Vector3(position.x, position.y + scale.y / 2 - frameThickness / 2, position.z);
@@ -581,7 +577,7 @@ public class ProceduralHouse : MonoBehaviour
             topBeam.transform.parent = parent;
             topBeam.GetComponent<Renderer>().material.color = doorFrameColor;
         }
-        else // Porte orientée le long de l'axe Z
+        else // Porte orientÃ©e le long de l'axe Z
         {
             // Montant avant
             GameObject frontPost = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -591,7 +587,7 @@ public class ProceduralHouse : MonoBehaviour
             frontPost.transform.parent = parent;
             frontPost.GetComponent<Renderer>().material.color = doorFrameColor;
 
-            // Montant arrière
+            // Montant arriÃ¨re
             GameObject backPost = GameObject.CreatePrimitive(PrimitiveType.Cube);
             backPost.name = "MontantArriere";
             backPost.transform.position = new Vector3(position.x, position.y, position.z + scale.z / 2 - frameThickness / 2);
@@ -599,7 +595,7 @@ public class ProceduralHouse : MonoBehaviour
             backPost.transform.parent = parent;
             backPost.GetComponent<Renderer>().material.color = doorFrameColor;
 
-            // Traverse supérieure
+            // Traverse supÃ©rieure
             GameObject topBeam = GameObject.CreatePrimitive(PrimitiveType.Cube);
             topBeam.name = "TraverseHaute";
             topBeam.transform.position = new Vector3(position.x, position.y + scale.y / 2 - frameThickness / 2, position.z);
@@ -611,7 +607,7 @@ public class ProceduralHouse : MonoBehaviour
 
     void CreateCorridor(Vector2Int from, Vector2Int to, float floorY)
     {
-        // Créer un conteneur pour le couloir
+        // CrÃ©er un conteneur pour le couloir
         GameObject corridorObj = new GameObject("Couloir [" + from.x + "," + from.y + "] to [" + to.x + "," + to.y + "]");
         corridorObj.transform.parent = this.transform;
 
@@ -635,7 +631,7 @@ public class ProceduralHouse : MonoBehaviour
             path.Add(current);
         }
 
-        // Créer les tuiles du couloir
+        // CrÃ©er les tuiles du couloir
         for (int i = 0; i < path.Count; i++)
         {
             CreateCorridorTile(path[i], floorY, wallHeight, wallThickness, corridorWidth, corridorObj.transform);
@@ -655,7 +651,7 @@ public class ProceduralHouse : MonoBehaviour
         Renderer floorRenderer = floor.GetComponent<Renderer>();
         floorRenderer.material.color = new Color(0.4f, 0.4f, 0.4f);
 
-        // Plafond du couloir (sauf pour le dernier étage)
+        // Plafond du couloir (sauf pour le dernier Ã©tage)
         if (floorY / floorHeight < numberOfFloors - 1)
         {
             GameObject ceiling = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -673,19 +669,19 @@ public class ProceduralHouse : MonoBehaviour
     {
         for (int floor = 0; floor < numberOfFloors - 1; floor++)
         {
-            // Trouver une pièce appropriée pour placer l'escalier
+            // Trouver une piÃ¨ce appropriÃ©e pour placer l'escalier
             if (floorRooms[floor].Count > 0 && floorRooms[floor + 1].Count > 0)
             {
                 RectInt lowerRoom = floorRooms[floor][Random.Range(0, floorRooms[floor].Count)];
 
-                // Placer l'escalier au centre de la pièce
+                // Placer l'escalier au centre de la piÃ¨ce
                 Vector3 stairPosition = new Vector3(
                     lowerRoom.center.x,
                     floor * floorHeight,
                     lowerRoom.center.y
                 );
 
-                // Créer l'escalier
+                // CrÃ©er l'escalier
                 CreateStairs(stairPosition, floor);
 
                 // Enregistrer la position de l'escalier
@@ -699,16 +695,16 @@ public class ProceduralHouse : MonoBehaviour
         GameObject stairsObj = new GameObject("Escalier " + fromFloor + " -> " + (fromFloor + 1));
         stairsObj.transform.parent = this.transform;
 
-        // Paramètres de l'escalier
+        // ParamÃ¨tres de l'escalier
         int numberOfSteps = 10;
         float stepWidth = 1.5f;
         float stepDepth = 0.3f;
         float stepHeight = floorHeight / numberOfSteps;
 
-        // Créer un trou dans le plafond pour l'escalier
+        // CrÃ©er un trou dans le plafond pour l'escalier
         CreateStairOpening(position, fromFloor, stepWidth + 0.5f, numberOfSteps * stepDepth + 0.5f);
 
-        // Créer les marches
+        // CrÃ©er les marches
         for (int i = 0; i < numberOfSteps; i++)
         {
             GameObject step = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -722,7 +718,7 @@ public class ProceduralHouse : MonoBehaviour
             step.transform.localScale = new Vector3(stepWidth, stepHeight, stepDepth);
             step.transform.parent = stairsObj.transform;
 
-            // Matériau pour l'escalier
+            // MatÃ©riau pour l'escalier
             Renderer stepRenderer = step.GetComponent<Renderer>();
             stepRenderer.material.color = new Color(0.8f, 0.6f, 0.4f); // Couleur bois
         }
@@ -733,7 +729,7 @@ public class ProceduralHouse : MonoBehaviour
 
     void CreateStairOpening(Vector3 position, int floor, float width, float depth)
     {
-        // Créer un trou dans le plafond pour permettre au joueur de monter
+        // CrÃ©er un trou dans le plafond pour permettre au joueur de monter
         GameObject stairOpening = new GameObject("Ouverture Escalier");
         stairOpening.transform.parent = this.transform;
         stairOpening.transform.position = new Vector3(
@@ -742,7 +738,7 @@ public class ProceduralHouse : MonoBehaviour
             position.z - depth / 2f
         );
 
-        // Ajouter un BoxCollider pour créer un "trou" dans le plafond
+        // Ajouter un BoxCollider pour crÃ©er un "trou" dans le plafond
         BoxCollider openingCollider = stairOpening.AddComponent<BoxCollider>();
         openingCollider.size = new Vector3(width, 0.3f, depth);
         openingCollider.isTrigger = true; // Pour que le joueur puisse traverser
@@ -761,7 +757,7 @@ public class ProceduralHouse : MonoBehaviour
         GameObject rightRailing = new GameObject("Rampe Droite");
         rightRailing.transform.parent = parent;
 
-        // Créer les poteaux de rampe
+        // CrÃ©er les poteaux de rampe
         for (int i = 0; i < steps + 1; i++)
         {
             // Poteau gauche
@@ -786,7 +782,7 @@ public class ProceduralHouse : MonoBehaviour
             rightPost.transform.localScale = new Vector3(postWidth, railingHeight, postWidth);
             rightPost.transform.parent = rightRailing.transform;
 
-            // Définir le matériau
+            // DÃ©finir le matÃ©riau
             Renderer leftRenderer = leftPost.GetComponent<Renderer>();
             leftRenderer.material.color = new Color(0.6f, 0.6f, 0.6f);
 
@@ -818,7 +814,7 @@ public class ProceduralHouse : MonoBehaviour
                 rightHorizontal.transform.localScale = new Vector3(postWidth, postWidth, stepDepth);
                 rightHorizontal.transform.parent = rightRailing.transform;
 
-                // Définir le matériau
+                // DÃ©finir le matÃ©riau
                 Renderer leftHorizRenderer = leftHorizontal.GetComponent<Renderer>();
                 leftHorizRenderer.material.color = new Color(0.6f, 0.6f, 0.6f);
 
@@ -836,14 +832,14 @@ public class ProceduralHouse : MonoBehaviour
         wall.transform.localScale = new Vector3(sx, sy, sz);
         wall.transform.parent = parent;
 
-        // Ajouter un matériau aux murs
+        // Ajouter un matÃ©riau aux murs
         Renderer wallRenderer = wall.GetComponent<Renderer>();
         wallRenderer.material.color = new Color(0.9f, 0.9f, 0.9f);
     }
 
+    // ðŸ” Spawn du joueur
     void SpawnPlayer()
     {
-        // Utiliser la première pièce du rez-de-chaussée comme point de départ
         if (floorRooms.Count > 0 && floorRooms[0].Count > 0)
         {
             Vector3 spawnPosition = new Vector3(
@@ -852,7 +848,6 @@ public class ProceduralHouse : MonoBehaviour
                 floorRooms[0][0].center.y
             );
 
-            // Si playerPrefab n'est pas assigné, créer une capsule simple
             if (playerPrefab == null)
             {
                 player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -860,37 +855,25 @@ public class ProceduralHouse : MonoBehaviour
                 player.transform.localScale = new Vector3(1, playerHeight / 2f, 1);
                 player.transform.position = spawnPosition;
 
-                // Ajouter les composants nécessaires
-                player.AddComponent<Rigidbody>();
-                player.GetComponent<Rigidbody>().freezeRotation = true;
+                player.AddComponent<Rigidbody>().freezeRotation = true;
                 player.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Continuous;
-                player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
 
-                // Ajouter le contrôleur de joueur
                 player.AddComponent<PlayerController>();
 
-                // Ajouter caméra
                 GameObject cameraObj = new GameObject("PlayerCamera");
                 cameraObj.AddComponent<Camera>();
-                cameraObj.transform.position = new Vector3(0, playerHeight / 2f, 0);
                 cameraObj.transform.parent = player.transform;
                 cameraObj.transform.localPosition = new Vector3(0, 0.7f, 0);
             }
             else
             {
-                // Continuation de la méthode SpawnPlayer()
                 player = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
                 player.name = "Player";
 
-                // Si le prefab n'a pas de contrôleur, en ajouter un
                 if (!player.GetComponent<PlayerController>())
-                {
                     player.AddComponent<PlayerController>();
-                }
 
-                // Vérifier si le prefab a une caméra, sinon en ajouter une
-                Camera playerCamera = player.GetComponentInChildren<Camera>();
-                if (playerCamera == null)
+                if (player.GetComponentInChildren<Camera>() == null)
                 {
                     GameObject cameraObj = new GameObject("PlayerCamera");
                     cameraObj.AddComponent<Camera>();
@@ -898,111 +881,16 @@ public class ProceduralHouse : MonoBehaviour
                     cameraObj.transform.localPosition = new Vector3(0, 0.7f, 0);
                 }
             }
-
-            // Ajouter un composant mouvement si nécessaire
-            if (!player.GetComponent<PlayerController>())
-            {
-                player.AddComponent<PlayerController>();
-            }
         }
         else
         {
-            Debug.LogError("Impossible de faire apparaître le joueur : aucune pièce générée.");
+            Debug.LogError("Impossible de faire apparaÃ®tre le joueur : aucune piÃ¨ce gÃ©nÃ©rÃ©e.");
         }
     }
 
-    // Classe pour contrôler le mouvement du joueur
-    public class PlayerController : MonoBehaviour
-    {
-        public float moveSpeed = 5f;
-        public float lookSpeed = 3f;
-        public float jumpForce = 5f;
-
-        private Camera playerCamera;
-        private Rigidbody rb;
-        private bool isGrounded;
-        private float rotationX = 0f;
-
-        void Start()
-        {
-            // Obtenir les références des composants
-            playerCamera = GetComponentInChildren<Camera>();
-            rb = GetComponent<Rigidbody>();
-
-            // Verrouiller et cacher le curseur
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-
-        void Update()
-        {
-            // Rotation de la caméra (regarder autour)
-            float mouseX = Input.GetAxis("Mouse X") * lookSpeed;
-            float mouseY = Input.GetAxis("Mouse Y") * lookSpeed;
-
-            rotationX -= mouseY;
-            rotationX = Mathf.Clamp(rotationX, -90f, 90f);
-
-            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
-            transform.Rotate(Vector3.up * mouseX);
-
-            // Sauter
-            if (Input.GetButtonDown("Jump") && isGrounded)
-            {
-                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            }
-
-            // Déverrouiller/verrouiller le curseur avec la touche Escape
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                if (Cursor.lockState == CursorLockMode.Locked)
-                {
-                    Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible = true;
-                }
-                else
-                {
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
-                }
-            }
-        }
-
-        void FixedUpdate()
-        {
-            // Mouvement du joueur
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
-
-            Vector3 movement = transform.right * horizontal + transform.forward * vertical;
-            movement.Normalize();
-
-            rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-
-            // Vérifier si le joueur est au sol
-            isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
-        }
-
-        void OnCollisionEnter(Collision collision)
-        {
-            // Vérifier si le joueur touche le sol
-            if (collision.contacts[0].normal.y > 0.5f)
-            {
-                isGrounded = true;
-            }
-        }
-
-        void OnCollisionExit(Collision collision)
-        {
-            // Vérifier si le joueur ne touche plus le sol
-            isGrounded = false;
-        }
-    }
-
-    // Méthode pour sauvegarder la configuration de la maison (pourrait être utilisée pour un mode éditeur)
+    // Configuration sauvegarde/chargement
     public void SaveHouseConfiguration()
     {
-        // Créer un objet de données pour stocker la configuration
         HouseData data = new HouseData
         {
             numberOfRoomsPerFloor = this.numberOfRoomsPerFloor,
@@ -1017,28 +905,20 @@ public class ProceduralHouse : MonoBehaviour
             doorHeight = this.doorHeight
         };
 
-        // Sauvegarder les données en JSON
         string json = JsonUtility.ToJson(data, true);
-
-        // Dans un contexte réel, on pourrait sauvegarder le fichier
-        // Pour l'exemple, on affiche juste le JSON dans la console
-        Debug.Log("Configuration sauvegardée : " + json);
-
-        // Ou sauvegarder dans PlayerPrefs
         PlayerPrefs.SetString("HouseConfig", json);
         PlayerPrefs.Save();
+
+        Debug.Log("Configuration sauvegardÃ©e.");
     }
 
-    // Méthode pour charger la configuration de la maison
     public void LoadHouseConfiguration()
     {
-        // Vérifier si une configuration existe
         if (PlayerPrefs.HasKey("HouseConfig"))
         {
             string json = PlayerPrefs.GetString("HouseConfig");
             HouseData data = JsonUtility.FromJson<HouseData>(json);
 
-            // Appliquer les données chargées
             this.numberOfRoomsPerFloor = data.numberOfRoomsPerFloor;
             this.numberOfFloors = data.numberOfFloors;
             this.roomSizeMin = data.roomSizeMin;
@@ -1050,15 +930,14 @@ public class ProceduralHouse : MonoBehaviour
             this.doorWidth = data.doorWidth;
             this.doorHeight = data.doorHeight;
 
-            Debug.Log("Configuration chargée avec succès.");
+            Debug.Log("Configuration chargÃ©e.");
         }
         else
         {
-            Debug.LogWarning("Aucune configuration sauvegardée trouvée.");
+            Debug.LogWarning("Aucune configuration sauvegardÃ©e trouvÃ©e.");
         }
     }
 
-    // Classe pour stocker les données de configuration de la maison
     [System.Serializable]
     public class HouseData
     {
@@ -1074,24 +953,19 @@ public class ProceduralHouse : MonoBehaviour
         public float doorHeight;
     }
 
-    // Méthode pour régénérer la maison (utile pour l'éditeur Unity ou pour générer de nouvelles maisons)
     public void RegenerateHouse()
     {
-        // Supprimer tous les enfants actuels
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(transform.GetChild(i).gameObject);
         }
 
-        // Réinitialiser les listes
         floorRooms.Clear();
         stairPositions.Clear();
         floorConnections.Clear();
 
-        // Régénérer la maison
         GenerateHouse();
 
-        // Replacer le joueur si nécessaire
         if (player != null)
         {
             Destroy(player);
@@ -1099,15 +973,11 @@ public class ProceduralHouse : MonoBehaviour
         SpawnPlayer();
     }
 
-    // Editor-only: Méthode pour visualiser la structure des pièces (utile pour le débogage)
     void OnDrawGizmos()
     {
-        // Dessiner les pièces en mode éditeur
         for (int floor = 0; floor < floorRooms.Count; floor++)
         {
             float floorY = floor * floorHeight;
-
-            // Couleur différente pour chaque étage
             Gizmos.color = new Color(
                 0.2f + (float)floor / numberOfFloors * 0.8f,
                 0.8f - (float)floor / numberOfFloors * 0.5f,
@@ -1115,7 +985,6 @@ public class ProceduralHouse : MonoBehaviour
                 0.3f
             );
 
-            // Dessiner chaque pièce
             foreach (RectInt room in floorRooms[floor])
             {
                 Vector3 center = new Vector3(
@@ -1125,13 +994,11 @@ public class ProceduralHouse : MonoBehaviour
                 );
 
                 Vector3 size = new Vector3(room.width, 1f, room.height);
-
                 Gizmos.DrawCube(center, size);
                 Gizmos.DrawWireCube(center, size);
             }
         }
 
-        // Dessiner les positions des escaliers
         Gizmos.color = Color.blue;
         foreach (Vector3 stairPos in stairPositions)
         {
@@ -1139,3 +1006,5 @@ public class ProceduralHouse : MonoBehaviour
         }
     }
 }
+
+

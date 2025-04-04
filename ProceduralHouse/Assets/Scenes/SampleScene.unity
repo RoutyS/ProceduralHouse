@@ -337,10 +337,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 661e7f866f80e2b4892e11e245753ea5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfRooms: 5
+  numberOfRoomsPerFloor: 5
+  numberOfFloors: 2
   roomSizeMin: {x: 4, y: 4}
   roomSizeMax: {x: 8, y: 8}
-  spacing: 2
+  floorHeight: 3
+  wallHeight: 2.8
+  wallThickness: 0.2
+  corridorWidth: 2
+  doorWidth: 1.2
+  doorHeight: 2.2
+  playerPrefab: {fileID: 0}
+  playerHeight: 1.8
 --- !u!4 &1459387562
 Transform:
   m_ObjectHideFlags: 0
