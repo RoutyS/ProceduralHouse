@@ -317,7 +317,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1459387562}
-  - component: {fileID: 1459387561}
+  - component: {fileID: 1459387563}
   m_Layer: 0
   m_Name: generateHouse
   m_TagString: Untagged
@@ -325,30 +325,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1459387561
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459387560}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 661e7f866f80e2b4892e11e245753ea5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numberOfRoomsPerFloor: 5
-  numberOfFloors: 2
-  roomSizeMin: {x: 4, y: 4}
-  roomSizeMax: {x: 8, y: 8}
-  floorHeight: 3
-  wallHeight: 2.8
-  wallThickness: 0.2
-  corridorWidth: 2
-  doorWidth: 1.2
-  doorHeight: 2.2
-  playerPrefab: {fileID: 0}
-  playerHeight: 1.8
 --- !u!4 &1459387562
 Transform:
   m_ObjectHideFlags: 0
@@ -364,6 +340,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1459387563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459387560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbeac572bccc3d749aad91e34a3125e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  solPrefab: {fileID: 7633524195987803975, guid: bd106caceb6cfc14b9b2334fb92d2125, type: 3}
+  plafondPrefab: {fileID: 5758317943738860249, guid: 21b28a1beacaf0747821317b8d8a169f, type: 3}
+  murPrefab: {fileID: 8771027741673770492, guid: 736c645dfe08a1e48ab4856dd2ce3ed9, type: 3}
+  murAvecPortePrefab: {fileID: 8590161607934218240, guid: 85fb48e2ed570fc41a15e399466eb41c, type: 3}
+  largeur: 3
+  hauteur: 3
+  taillePiece: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
